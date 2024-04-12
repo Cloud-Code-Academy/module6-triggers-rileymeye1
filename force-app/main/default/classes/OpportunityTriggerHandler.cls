@@ -31,7 +31,9 @@ public with sharing class OpportunityTriggerHandler {
             }
 
             for (Opportunity opp : updatedOpportunities) {
-                opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
+                if (accountIdContactMap.get(opp.AccountId) != null) {
+                    opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
+                }
             }
         }
     }
