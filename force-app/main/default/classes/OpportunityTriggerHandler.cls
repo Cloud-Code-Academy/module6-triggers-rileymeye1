@@ -14,4 +14,26 @@ public with sharing class OpportunityTriggerHandler {
             }
         }
     }
+
+    public static void beforeDelete(List<Opportunity> deletedOpportunities) {
+        Set<Id> closedWonOppsIds = new Set<Id>();
+        SEt<Id> bankingAccountIds = new Set<Id>();
+
+        for (Opportunity opp : deletedOpportunities) {
+            if (opp.IsWon && opp.StageName == 'Closed Won') {
+                closedWonOppsIds.add(opp.Id);
+                bankingAccountIds.add(opp.AccountId);
+            }
+        }
+
+        Map<Id, Account> bankingAccountsMap = new Map<Id, Account>([SELECT Id, Industry
+                                                                    FROM Account
+                                                                    WHERE Id IN :bankingAccountIds AND Industry = 'Banking']);
+
+        for (Opportunity opp : deletedOpportunities) {
+            if (closedWonOppsIds.contains(opp.Id) && bankingAccountsMap.containsKey(opp.AccountId)) {
+                opp.addError('Cannot delete closed opportunity for a banking account that is won');
+            }
+        }
+    }
 }
