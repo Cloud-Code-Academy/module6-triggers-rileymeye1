@@ -12,6 +12,14 @@ public with sharing class AccountTriggerHandler {
             if (acc.Type == null) {
                 acc.Type = 'Prospect';
             }
+
+            if (acc.ShippingAddress == null) {
+                acc.BillingStreet = acc.ShippingStreet;
+                acc.BillingCity = acc.ShippingCity;
+                acc.BillingState = acc.ShippingState;
+                acc.BillingPostalCode = acc.ShippingPostalCode;
+                acc.BillingCountry = acc.ShippingCountry;
+            }
         }
     }
 }
