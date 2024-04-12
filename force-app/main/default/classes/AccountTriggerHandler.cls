@@ -20,6 +20,10 @@ public with sharing class AccountTriggerHandler {
                 acc.BillingPostalCode = acc.ShippingPostalCode;
                 acc.BillingCountry = acc.ShippingCountry;
             }
+
+            if (acc.Phone != null && acc.Website != null && acc.Fax != null) {
+                acc.Rating = 'Hot';
+            }
         }
     }
 }
