@@ -13,6 +13,25 @@ public with sharing class OpportunityTriggerHandler {
                 opp.addError('Opportunity amount must be greater than 5000');
             }
         }
+
+        Set<Id> opportunityAccountIds = new Set<Id>();
+        for (Opportunity opp : updatedOpportunities) {
+            opportunityAccountIds.add(opp.AccountId);
+        }
+
+        List<Contact> foundContacts = [SELECT Id, AccountId, Title
+                                        FROM Contact
+                                        WHERE AccountId IN :opportunityAccountIds AND Title = 'CEO'
+                                        WITH USER_MODE];
+        
+        Map<Id, Contact> accountIdContactMap = new Map<Id, Contact>();
+        for (Contact con : foundContacts) {
+            accountIdContactMap.put(con.AccountId, con);
+        }
+
+        for (Opportunity opp : updatedOpportunities) {
+            opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
+        }
     }
 
     public static void beforeDelete(List<Opportunity> deletedOpportunities) {
@@ -28,7 +47,8 @@ public with sharing class OpportunityTriggerHandler {
 
         Map<Id, Account> bankingAccountsMap = new Map<Id, Account>([SELECT Id, Industry
                                                                     FROM Account
-                                                                    WHERE Id IN :bankingAccountIds AND Industry = 'Banking']);
+                                                                    WHERE Id IN :bankingAccountIds AND Industry = 'Banking'
+                                                                    WITH USER_MODE]);
 
         for (Opportunity opp : deletedOpportunities) {
             if (closedWonOppsIds.contains(opp.Id) && bankingAccountsMap.containsKey(opp.AccountId)) {
