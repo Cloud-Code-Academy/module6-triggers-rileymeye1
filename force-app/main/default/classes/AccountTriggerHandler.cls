@@ -26,4 +26,12 @@ public with sharing class AccountTriggerHandler {
             }
         }
     }
+
+    public static void afterInsert(List<Account> newAccounts) {
+        List<Contact> contactsToAdd = new List<Contact>();
+        for (Account acc : newAccounts) {
+            contactsToAdd.add(new Contact(LastName = 'DefaultContact', Email = 'default@email.com', AccountId = acc.Id));
+        }
+        Database.insert(contactsToAdd, AccessLevel.USER_MODE);
+    }
 }
