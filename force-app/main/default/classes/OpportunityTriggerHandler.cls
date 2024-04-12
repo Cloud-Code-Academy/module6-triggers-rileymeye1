@@ -13,24 +13,26 @@ public with sharing class OpportunityTriggerHandler {
                 opp.addError('Opportunity amount must be greater than 5000');
             }
         }
-
-        Set<Id> opportunityAccountIds = new Set<Id>();
+        
+        List<Id> opportunityAccountIds = new List<Id>();
         for (Opportunity opp : updatedOpportunities) {
             opportunityAccountIds.add(opp.AccountId);
         }
 
-        List<Contact> foundContacts = [SELECT Id, AccountId, Title
-                                        FROM Contact
-                                        WHERE AccountId IN :opportunityAccountIds AND Title = 'CEO'
-                                        WITH USER_MODE];
+        if (opportunityAccountIds.size() > 0) {
+            List<Contact> foundContacts = [SELECT Id, AccountId, Title
+                                            FROM Contact
+                                            WHERE AccountId IN :opportunityAccountIds AND Title = 'CEO'
+                                            WITH USER_MODE];
         
-        Map<Id, Contact> accountIdContactMap = new Map<Id, Contact>();
-        for (Contact con : foundContacts) {
-            accountIdContactMap.put(con.AccountId, con);
-        }
+            Map<Id, Contact> accountIdContactMap = new Map<Id, Contact>();
+            for (Contact con : foundContacts) {
+                accountIdContactMap.put(con.AccountId, con);
+            }
 
-        for (Opportunity opp : updatedOpportunities) {
-            opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
+            for (Opportunity opp : updatedOpportunities) {
+                opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
+            }
         }
     }
 
