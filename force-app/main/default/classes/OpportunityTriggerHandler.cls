@@ -2,7 +2,7 @@
  * @description       : 
  * @Riley Meyer            : ChangeMeIn@UserSettingsUnder.SFDoc
  * @group             : 
- * @last modified on  : 04-11-2024
+ * @last modified on  : 04-13-2024
  * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
 **/
 public with sharing class OpportunityTriggerHandler {
@@ -16,7 +16,9 @@ public with sharing class OpportunityTriggerHandler {
         
         List<Id> opportunityAccountIds = new List<Id>();
         for (Opportunity opp : updatedOpportunities) {
-            opportunityAccountIds.add(opp.AccountId);
+            if (opp.AccountId != null){
+                opportunityAccountIds.add(opp.AccountId);
+            }
         }
 
         if (opportunityAccountIds.size() > 0) {
@@ -31,9 +33,7 @@ public with sharing class OpportunityTriggerHandler {
             }
 
             for (Opportunity opp : updatedOpportunities) {
-                if (accountIdContactMap.get(opp.AccountId) != null) {
-                    opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
-                }
+                opp.Primary_Contact__c = accountIdContactMap.get(opp.AccountId).Id;
             }
         }
     }
